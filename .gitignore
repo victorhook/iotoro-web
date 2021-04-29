@@ -4,3 +4,4 @@ iotoro/iotoro/settings.py
 env/
 tools/
 .vscode/
+temp/

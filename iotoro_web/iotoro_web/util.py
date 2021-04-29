@@ -1,4 +1,6 @@
-import secrets
-import base64
+from django.utils import timezone
 
-#secrets.token_bytes(64).bas
+
+def format_date(date: timezone) -> str:
+    return date.strftime("%Y-%m-%d %H:%M:%S")
+    

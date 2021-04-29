@@ -1,6 +1,5 @@
 import binascii
 from dataclasses import dataclass, field
-from datetime import datetime
 import hashlib
 
 from django.conf import settings
@@ -10,18 +9,6 @@ from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
 
 import logging
-
-
-# -- Classes -- #
-@dataclass
-class Packet:
-    device_id: str
-    data: field(default_factory=bytes)
-    timestamp: datetime
-
-    # Added after encryption.
-    action: int = None
-    version: int = None
 
 
 
@@ -44,13 +31,26 @@ def md5(device_id: str) -> str:
 
 
 def ashex(data):
-    return ' '.join(hex(a)[2:] for a in data)
+    return ' '.join(hex(a)[2:].zfill(2) for a in data)
 
 
-def decode_packet(data: bytes, device_key: bytes) -> Packet:
+
+def decrypt_packet(data: bytes, device_key: bytes) -> bytes:
     """ Decodes a packet using AES encryption, given the device key. """
     # Turn the data into a packet helper format.
     packet = _get_raw_packet(data)
+
+    """
+    logging.debug('OK')
+    logging.debug(ashex(data[:3]))
+    logging.debug(ashex(data[3:3+24]))
+    logging.debug(ashex(data[3+24:3+24+8]))
+    logging.debug(ashex(data[3+24+8:3+24+8+16]))
+    logging.debug(f'Device key: {device_key}')
+    logging.debug(f'Data: {ashex(packet.data)}')
+    logging.debug(f'IV: {ashex(packet.iv)}')
+    """
+
 
     if type(device_key) is str:
         device_key = binascii.unhexlify(device_key)
@@ -59,21 +59,19 @@ def decode_packet(data: bytes, device_key: bytes) -> Packet:
     cipher = AES.new(device_key, AES.MODE_CBC, packet.iv)
 
     # Decrypt & unpad the data.
-    decrypted = cipher.decrypt(packet.data)
     try:
-        decrypted = unpad(decrypted, AES.block_size)
-    except ValueError:
-        logging.warn('Padding is incorrect, might be incorrect key!')
+        decrypted = cipher.decrypt(packet.data)
+    except ValueError as e:
+        logging.warn(f'ValuError when decrypting packet: {e}')
         return None
 
-    # Pack the info into a packet format.
-    packet = Packet(
-        device_id=_get_device_id(decrypted),
-        data=_get_packet_body(decrypted),
-        timestamp=datetime.now()
-    )
+    try:
+        decrypted = unpad(decrypted, AES.block_size)
+    except ValueError as e:
+        logging.warn(f'{e}, might be incorrect key!')
+        return None
 
-    return packet
+    return decrypted
 
 
 def encode_packet(device_key: bytes, device_id: bytes, 
@@ -113,17 +111,9 @@ def get_default_id() -> str:
 
 # -- Helper methods -- ##
 
-def _get_device_id(packet: bytes) -> str:
-    return binascii.hexlify(packet[-settings.DEVICE_ID_SIZE:]).decode('utf-8')
-
-
-def _get_packet_body(data: bytes) -> bytes:
-    return data[:settings.DEVICE_ID_SIZE]
-
-
 def _get_raw_packet(raw_data: bytes) -> RawPacket:
     iv = raw_data[-16:]      # first 16 bytes is the initialization vector.
-    data = raw_data[:16]     # rest is the data
+    data = raw_data[:-16]     # rest is the data
     return RawPacket(iv, data)
 
 

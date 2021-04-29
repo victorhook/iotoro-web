@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 
 from . import models
 from . import forms
-from restapi import models as api_models
+from . import models as api_models
+from protocol import models as protocol_models
 
 
 def get_device_form(device: models.Device = None) -> forms.DeviceForm:
@@ -27,15 +28,15 @@ def get_device(user: User, device_name: str) -> list:
                                      name=device_name)
 
 
-def get_latest_packet(device: models.Device) -> api_models.Message:
+def get_latest_packet(device: models.Device) -> protocol_models.Message:
     try:
-        return api_models.Message.objects.filter(
+        return protocol_models.Message.objects.filter(
                                         device=device).latest('timestamp')
-    except api_models.Message.DoesNotExist:
+    except protocol_models.Message.DoesNotExist:
         return None
 
 
-def get_data_length_of_message(msg: api_models.Message) -> int:
+def get_data_length_of_message(msg: protocol_models.Message) -> int:
     if msg.data is None:
         return 0
     else:

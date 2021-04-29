@@ -3,8 +3,8 @@ import socket
 
 from django.conf import settings
 
-from iotoro_web import crypto_utils
-from iotoro_web import api
+from protocol import crypto_utils
+from protocol import api
 
 
 class IotoroClient:
