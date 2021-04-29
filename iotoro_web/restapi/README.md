@@ -18,7 +18,11 @@ There are different types of messages:
 |---------|--------|-------------|-----------|
 | Version | Action | Payload len |  Content  |
 
-#### Content
+### Content
+#### Parameter
+|  0-9  |  10  |  11-18  |
+|-------|------|---------|
+|  name | type |  value  |
 
 ## Messages
 

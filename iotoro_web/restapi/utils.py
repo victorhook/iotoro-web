@@ -3,17 +3,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from iotoro_web import crypto_utils
-from iotoro_web import api
+from protocol import crypto_utils
+from protocol import api
 from device import models
-
-
-def make_pong() -> bytes:
-    return api.make_data_packet(
-        settings.IOTORO_VERSION,
-        api.Action.PONG,
-        b''
-    )
 
 
 def get_device(device_id: str) -> models.Device:
@@ -39,23 +31,16 @@ def requires_device_auth(func: callable):
             device = get_device(device_id)
 
             # Try to decrypt the packet
-            packet = crypto_utils.decode_packet(request.body,
-                                                device.device_key)
+            packet = api.decode_packet(request.body, device.device_key)
+
 
             # TODO: Handle these errors better.
-            
             if packet is None:
                 print('Incorrect authorization')
                 return HttpResponse('Incorrect authorization')
 
             if packet.device_id == device.device_id:
                 print(f'Device id {packet.device_id} authorized')
-
-                # Decode that data in the packet and put in the body.
-                data_packet = api.decode_data_packet(packet.data)
-                packet.version = data_packet.version
-                packet.action = data_packet.action
-                packet.data = data_packet.content
 
                 # Call the view function.
                 return func(request, device, packet)
