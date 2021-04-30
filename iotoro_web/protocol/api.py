@@ -73,8 +73,8 @@ class IotoroPacket:
 
 def _make_data_packet(version: int, action: int, content: bytes) -> bytes:
     first_byte = (version << 4) | action
-    first_byte = struct.pack('B', first_byte)
-    return first_byte + content
+    header = struct.pack('BH', first_byte, len(content))
+    return header + content
 
 
 def _get_payload_size(data: bytes) -> int:
@@ -108,6 +108,21 @@ def _decode_packet(data: bytes) -> IotoroPacket:
 
 # -- Public -- #
 
+def encrypt_packet(make_packet: callable):
+    """ 
+        Decorator that encrypts whatever packet-making method that
+        uses it.
+        Note: This requires device_key: str, device_id: str as args.
+    """
+    def wrapper(device_key: str, device_id: str, content: bytes = None):
+        data = make_packet()
+        data = crypto_utils.encrypt_packet(device_key, device_id, data)
+        return data
+
+    return wrapper
+
+
+@encrypt_packet
 def make_pong() -> bytes:
     return _make_data_packet(
         settings.IOTORO_VERSION,
@@ -119,5 +134,4 @@ def decode_packet(data: bytes, device_key: bytes) -> IotoroPacket:
     decrypted_data = crypto_utils.decrypt_packet(data, device_key)
     packet = _decode_packet(decrypted_data)
     return packet
-
 

@@ -58,13 +58,14 @@ def decrypt_packet(data: bytes, device_key: bytes) -> bytes:
     # Create cypher from given iv and the device key.
     cipher = AES.new(device_key, AES.MODE_CBC, packet.iv)
 
-    # Decrypt & unpad the data.
+    # Decrypt the data.
     try:
         decrypted = cipher.decrypt(packet.data)
     except ValueError as e:
         logging.warn(f'ValuError when decrypting packet: {e}')
         return None
 
+    # Unpad the data.
     try:
         decrypted = unpad(decrypted, AES.block_size)
     except ValueError as e:
@@ -74,9 +75,8 @@ def decrypt_packet(data: bytes, device_key: bytes) -> bytes:
     return decrypted
 
 
-def encode_packet(device_key: bytes, device_id: bytes, 
-                  data: bytes) -> RawPacket:
-    """ Encodes the given data with the device key and returns a packet. """
+def encrypt_packet(device_key: bytes, device_id: bytes, data: bytes) -> bytes:
+    """ Encrypts the given data with the device key and returns a packet. """
     device_key = binascii.unhexlify(device_key)
     device_id = binascii.unhexlify(device_id)
 
@@ -91,7 +91,7 @@ def encode_packet(device_key: bytes, device_id: bytes,
 
     # Encrypt the data
     encrypted = cipher.encrypt(data)
-    return RawPacket(iv, encrypted)
+    return encrypted
 
 
 def random_bytes(length: int) -> bytes:
