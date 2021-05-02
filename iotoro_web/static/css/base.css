@@ -16,15 +16,19 @@ body {
 }
 
 .fg-secondary {
-    color: rgb(230, 234, 251) !important;
+    color: rgb(251, 242, 230) !important;
 }
 
 .bg-primary {
-    background-color: #223754 !important;
+    background-color: #222222 !important;
+}
+
+.bg-primary-darker {
+    background-color: #813d1e !important;
 }
 
 .bg-secondary {
-    background-color: #426eac !important;
+    background-color: rgb(243, 108, 45) !important;
 }
 
 .nav-link {
@@ -56,11 +60,13 @@ footer p {
     display: block;
     height: 100%;
     padding: 0;
+    display: flex;
+    flex-direction: row;
 }
 
 .content {
     width: 100%;
-    height: 100%;
+    padding: 2em;
 }
 
 .button-container {
@@ -74,18 +80,20 @@ footer p {
 }
 
 .button  {
-    background-color: #7b9bc8;
-    color: rgb(255, 255, 255);
-    padding: .3em .6em;
+    background-color: #F36C2D;
+    color: rgb(0, 0, 0);
+    padding: .5em .8em;
+    border-radius: 10px;
     border: none;
     font-size: 1.2em;
+    font-weight: 600;
     width: min-content;
     transition: 0.3s ease-in-out background-color, color;
 }
 
 .button:hover {
-    background-color: #577bad;
-    color: rgb(212, 212, 212);
+    background-color: #d35921;
+    color: rgb(0, 0, 0);
 }
 
 .button-primary {
@@ -95,9 +103,10 @@ footer p {
 /* Sidebar */
 
 .sidebar {
-    width: 15em;
-    border: 1px solid white;
+    width: 20em;
     height: 100%;
+    background-color: #161616;
+    padding: .7em;
 }
 
 .list-group-item {
@@ -107,13 +116,15 @@ footer p {
 }
 
 .sidebar-link {
-    color: #e6eafb;
+    color: #e6e6e6;
     background-color: transparent;
     border: none;
+    font-size: 1.2em;
+    font-weight: 600;
 }
 
 .sidebar-link:hover {
-    background-color: #31445f;
+    background-color: #813d1e;
     color:rgb(230, 234, 251);
 }
 
