@@ -48,5 +48,5 @@ def get_total_data_send(device: models.Device) -> int:
         messages = api_models.Message.objects.filter(device=device)
         message_lengths = map(get_data_length_of_message, messages)
         return sum(message_lengths)
-    except api_models.Message.DoesNotExist:
+    except AttributeError or api_models.Message.DoesNotExist:
         return 0
