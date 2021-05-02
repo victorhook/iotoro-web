@@ -1,7 +1,6 @@
-input[type=text] {
-    background-color: #2c4b75;
+input[type=text], select {
     border: none;
-    color: white;
+    padding: .5em;
 }
 
 input:focus {
@@ -18,4 +17,34 @@ label, input[type=text], select {
 
 .nav-tabs .active {
     background-color: #385c8f !important;
+}
+
+
+.label-help-wrapper {
+    background-color: red;
+}
+
+.form-select {
+    outline: none !important;
+    border: none !important;
+}
+
+.messages {
+    list-style: none;
+}
+
+.device-content {
+    display: block;
+    height: 100%;
+}
+
+
+/* -- Overview -- */
+.overview .table-container,
+.overview .graph-container{
+    padding: 1em;
+}
+
+.overview .table-container {
+    font-size: 1.2em;
 }

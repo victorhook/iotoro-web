@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="{% static 'device.css' %}">
 {% endblock %}
 
+{% block content_title %}
+    Device {{ selected_device.name }}
+{% endblock %}
+
+
 {% block content %}
 
     <div class="row">
@@ -72,8 +77,6 @@
 
         </div>
     </div>
-
-    <button id="test">TEST</button>
 
 {% endblock %}
 

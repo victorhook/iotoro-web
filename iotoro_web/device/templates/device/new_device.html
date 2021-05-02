@@ -20,6 +20,14 @@
     <div class="offset-1 col-10 offset-xl-3 col-xl-6 new-device">
         <form method="POST" action="{% url 'new_device' %}" class="d-flex flex-column fg-primary">
 
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             {% csrf_token %}
 
             {% for field in form %}
@@ -36,14 +44,13 @@
                 </label>
                 
                 {% if field.widget_type == 'select' %}
-                    <select class="form-select" aria-label="Default select example" name="{{ field.name }}"
-                            >
+                    <select class="form-select fg-primary bg-primary-darker" aria-label="Default select example" name="{{ field.name }}">
                         {% for widget in field.subwidgets %}
                             {{ widget }}
                         {% endfor %}
                     </select>
                 {% elif field.widget_type == 'text' %}
-                    <input type="text" class="fg-primary" name="{{ field.name }}" id="{{ field.id }}" value="{{ field.value }}">
+                    <input type="text" class="bg-primary-darker fg-primary" name="{{ field.name }}" id="{{ field.id }}" value="{{ field.value }}">
                 {% endif %}
 
                 <!-- Check if there's an error in the field! Not most efficient way to do it, but works -->
@@ -55,8 +62,9 @@
 
             {% endfor %}
 
+
             <div class="button-container">
-                <input type="submit" id="create-new-button" class="btn btn-primary" value="Create">
+                <input type="submit" id="create-new-button" class="button button-primary" value="Create">
             </div>
         </form>
     </div>
