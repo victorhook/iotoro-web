@@ -11,6 +11,10 @@ body {
     font-family: 'Source Code Pro', monospace;
 }
 
+ul {
+    list-style: none;
+}
+
 .fg-primary {
     color: #e6eafb !important;
 }
@@ -32,22 +36,25 @@ body {
 }
 
 .nav-link {
-    color: rgb(231, 231, 231) !important;
-    font-weight: 600;
+    color: rgb(12, 12, 12) !important;
+    font-weight: 700;
+    font-size: 1.2em;
+    padding: 0 2em;
 }
 
 .nav-link:hover {
-    color: rgb(143, 160, 216) !important;
+    color: rgb(43, 43, 43) !important;
 }
 
 .link {
-    color: rgb(46, 46, 46);
+    color: rgb(235, 235, 235);
+    font-weight: 600;
     text-decoration: none;
     transition: 0.3s ease-in-out color;
 }
 
 .link:hover {
-    color:rgb(93, 80, 167);
+    color:rgb(223, 115, 43);
     text-decoration: none;
 }
 
@@ -110,7 +117,7 @@ footer p {
     width: 20em;
     height: 100%;
     background-color: #161616;
-    padding: .7em;
+    padding: 3em .7em 0 .7em;
 }
 
 .list-group-item {
@@ -120,11 +127,13 @@ footer p {
 }
 
 .sidebar-link {
-    color: #e6e6e6;
+    color: #f7f7f7;
     background-color: transparent;
     border: none;
     font-size: 1.2em;
     font-weight: 600;
+    display: flex;
+    flex-direction: row;
 }
 
 .sidebar-link:hover {
@@ -132,6 +141,13 @@ footer p {
     color:rgb(230, 234, 251);
 }
 
+.sidebar-category{
+    padding: 1.5em 0;
+}
+
+.nav-icon {
+    padding-right: .5em;
+}
 
 /* -- Login -- */
 .login-card {
@@ -161,4 +177,14 @@ footer p {
 .login-input:focus {
     outline: none;
     background-color: #284f85 !important;
+}
+
+
+/* -- About -- */
+.about {
+    padding-top: 2em;
+}
+
+.about-section {
+    padding: 1em 2em;
 }
