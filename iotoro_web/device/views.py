@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime
+from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.db.utils import IntegrityError
 from django.utils import timezone
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required
@@ -16,10 +18,18 @@ def new_device(request: HttpRequest):
         device_obj = models.Device(user=request.user)
         device_form = forms.DeviceForm(request.POST, instance=device_obj)
         if device_form.is_valid():
-            device_form.save()
+            try:
+                print('Trying to save...')
+                device_form.save()
+            except IntegrityError as e:
+                messages.warning(request, 'You already have a device with this\
+                                 name. Please choose a unique one.')
+                return render(request, 'new_device.html', {'form': device_form})
+            
             return redirect('device')
         else:
             #TODO: Handle error here?
+            print('Not valid!...')
             return render(request, 'new_device.html', {'form': device_form})
     else:
         device_form = utils.get_device_form()
