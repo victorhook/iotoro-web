@@ -34,7 +34,6 @@ def ashex(data):
     return ' '.join(hex(a)[2:].zfill(2) for a in data)
 
 
-
 def decrypt_packet(data: bytes, device_key: bytes) -> bytes:
     """ Decodes a packet using AES encryption, given the device key. """
     # Turn the data into a packet helper format.
@@ -80,7 +79,9 @@ def encrypt_packet(device_key: bytes, device_id: bytes, data: bytes) -> bytes:
     device_key = binascii.unhexlify(device_key)
     device_id = binascii.unhexlify(device_id)
 
-    iv = _generate_iv()
+    #iv = _generate_iv()
+    iv = bytes([0] * 16)
+    
     cipher = AES.new(device_key, AES.MODE_CBC, iv)
 
     # Add device_id to data
@@ -90,8 +91,12 @@ def encrypt_packet(device_key: bytes, device_id: bytes, data: bytes) -> bytes:
     data = pad(data, AES.block_size)
 
     # Encrypt the data
-    encrypted = cipher.encrypt(data)
-    return encrypted
+    data = cipher.encrypt(data)
+
+    # Append the iv to the packet.
+    data += iv
+
+    return data
 
 
 def random_bytes(length: int) -> bytes:
