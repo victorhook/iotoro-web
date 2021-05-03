@@ -13,12 +13,16 @@ import logging
 
 
 class Action:
-    PING = 1
-    WRITE_UP = 2
+    PING = 0
+    WRITE_UP = 1
+    WRITE_UP_ACK = 2
     WRITE_DOWN = 3
-    PONG = 4
-    READ_UP = 5
-    READ_DOWN = 6
+    WRITE_DOWN_ACK = 4
+    PONG = 5
+    READ_UP = 6
+    READ_UP_ACK = 7
+    READ_DOWN = 8
+    READ_DOWN_ACK = 9
 
 
 def get_action_choices() -> list:
@@ -73,7 +77,7 @@ class IotoroPacket:
 
 def _make_data_packet(version: int, action: int, content: bytes) -> bytes:
     first_byte = (version << 4) | action
-    header = struct.pack('BH', first_byte, len(content))
+    header = struct.pack('<BH', first_byte, len(content))
     return header + content
 
 
@@ -130,8 +134,23 @@ def make_pong() -> bytes:
         b''
     )
 
+@encrypt_packet
+def make_write_ack() -> bytes:
+    return _make_data_packet(
+        settings.IOTORO_VERSION,
+        Action.WRITE_UP_ACK,
+        b''
+    )
+
+@encrypt_packet
+def make_read_ack() -> bytes:
+    return _make_data_packet(
+        settings.IOTORO_VERSION,
+        Action.READ_UP_ACK,
+        b''
+    )
+
 def decode_packet(data: bytes, device_key: bytes) -> IotoroPacket:
     decrypted_data = crypto_utils.decrypt_packet(data, device_key)
     packet = _decode_packet(decrypted_data)
     return packet
-
