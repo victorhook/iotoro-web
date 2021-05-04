@@ -15,7 +15,7 @@ from device.models import Device
 from . import utils
 from . import models
 from protocol import models as protocol_models
-from protocol.models import MessageDownStream
+from protocol.models import MessageDownStream, MessageUpStream
 
 
 # Create your views here.
@@ -25,7 +25,7 @@ def index(request: HttpRequest):
 
 
 def has_response_in_buffer(device: Device) -> bool:
-    messages = MessageDownStream.objects.filter(msg_to=device, sent=None)
+    messages = MessageDownStream.objects.filter(device=device, sent=None)
     return len(messages) > 0
 
 
@@ -33,7 +33,7 @@ def get_response_in_buffer(device: Device) -> MessageDownStream:
     """ Returns a message from the database buffer.
         If the buffer is empty, None is returned.
     """
-    buffer = MessageDownStream.objects.filter(msg_to=device, sent=None)
+    buffer = MessageDownStream.objects.filter(device=device, sent=None)
     response = buffer[0]
     utils.mark_as_sent(response)
     return response
@@ -61,33 +61,33 @@ def get_response(device: Device, create_message: callable):
 def make_response(msg: MessageDownStream) -> bytes:
     return HttpResponse(msg.as_bytes(), content_type='application/octet-stream')
 
- 
 
 def pong(device: Device) -> HttpResponse:
     msg = get_response(device, api.make_pong)
     return make_response(msg)
 
 
-def write_up(device: Device) -> HttpResponse:
-    data = api.make_write_ack(device.device_key, device.device_id)
-    return HttpResponse(data, content_type='application/octet-stream')
+def write_up(device: Device, packet: MessageUpStream) -> HttpResponse:
+    packet.save()
+    msg = get_response(device, api.make_write_ack)
+    return make_response(msg)
     
 
-
-def read_up(device: Device) -> HttpResponse:
+def read_up(device: Device, packet: MessageUpStream) -> HttpResponse:
+    packet.save()
     data = api.make_read_ack(device.device_key, device.device_id)
     return HttpResponse(data, content_type='application/octet-stream')
 
 
 @utils.requires_device_auth
-def device_push(request: HttpRequest, device: Device, packet: api.IotoroPacket):
+def device_push(request: HttpRequest, device: Device, packet: MessageUpStream):
     
     if packet.action == api.Action.PING:
         return pong(device)
     elif packet.action == api.Action.WRITE_UP:
-        return write_up(device)
+        return write_up(device, packet)
     elif packet.action == api.Action.READ_UP:
-        return read_up(device)
+        return read_up(device, packet)
 
     logging.warn(f'Failed to recognize command {packet.action}')
     return HttpResponse(f'Failed to recognize command {packet.action}')
