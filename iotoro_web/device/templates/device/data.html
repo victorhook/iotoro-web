@@ -6,31 +6,54 @@
 
 {% block device_content %}
 
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th scope="col">Sent</th>
-                <th scope="col">Action</th>
-                <th scope="col">Packet size</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="data-table">
+        <div class="table-header row">
+            <div class="col-3">Sent</div>
+            <div class="col-3">Action</div>
+            <div class="col-3">Packet size</div>
+        </div>
+
+        <div class="table-body">
+
             {% for packet in packets %}
-                <tr class="clickable">
-                    <td>
-                        {{ packet.sent|date:"d-m-Y"}}
-                        {{ packet.sent|time:"H:i" }}
-                    </td>
-                    <td>
-                        {{ packet.get_action }}
-                    </td>
-                    <td>
-                        {{ packet|length }} bytes
-                    </td>
-                </tr>
+                <details class="table-row clickable">
+                    <summary class="row">
+                        <div class="col-3">
+                            {{ packet.sent|date:"d-m-Y"}}
+                            {{ packet.sent|time:"H:i" }}
+                        </div>
+                        <div class="col-3">
+                            {{ packet.get_action }}
+                        </div>
+                        <div class="col-3">
+                            {{ packet|length }} bytes
+                        </div>
+                    </summary>
+                    <div class="table-row-content">
+                        <table>
+                            <tr>
+                                <td>From:</td>
+                                <td>{{ packet.user }}</td>
+                            </tr>
+                            <tr>
+                                <td>To:</td>
+                                <td>{{ packet.device }}</td>
+                            </tr>
+                            <tr>
+                                <td>Data:</td>
+                                <td>{{ packet.data }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </details>
+
             {% endfor %}
-        </tbody>
-    </table>
+
+        </div>
+
+    </div>
+
+
 
 
 {% endblock %}
