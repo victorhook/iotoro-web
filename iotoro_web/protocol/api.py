@@ -8,8 +8,10 @@ from django.conf import settings
 from . import crypto_utils
 from . import models
 from . import params
+from .models import MessageDownStream
 from iotoro_web import util
 import logging
+from device.models import Device
 
 
 class Action:
@@ -49,10 +51,22 @@ class IotoroPacket:
 
 # -- Helper methods -- #
 
-def _make_data_packet(version: int, action: int, content: bytes) -> bytes:
+def _make_message(device: Device, payload: bytes, action: Action) -> MessageDownStream:
+    """ Returns a downstream message. """
+    message = MessageDownStream(
+        msg_to=device,
+        msg_from=device.user,
+        data=payload,
+        type=action
+    )
+    return message
+
+
+def _make_data_packet(version: int, action: int, content: bytes) -> tuple:
+    """ Returns a tuple of: (payload, action) """
     first_byte = (version << 4) | action
     header = struct.pack('<BH', first_byte, len(content))
-    return header + content
+    return header + content, action
 
 
 def _get_payload_size(data: bytes) -> int:
@@ -100,24 +114,47 @@ def encrypt_packet(make_packet: callable):
     return wrapper
 
 
-@encrypt_packet
-def make_pong() -> bytes:
+def make_message(make_packet_data: callable):
+    """ 
+        Decorator that encrypts whatever packet-making method that
+        uses it.
+        Note: This requires device_key: str, device_id: str as args.
+    """
+    # device_key: str, device_id: str, content: bytes = None
+    def wrapper(device: Device):
+        # Create the packet payload.
+        data, action = make_packet_data(device)
+
+        # Encrypt the payload.
+        payload = crypto_utils.encrypt_packet(device.device_key, 
+                                              device.device_id, data)
+
+        # Create a message obj which we can save to database.
+        message = _make_message(device, payload, action)
+
+        return message
+
+    return wrapper
+
+
+@make_message
+def make_pong(device: Device) -> MessageDownStream:
     return _make_data_packet(
         settings.IOTORO_VERSION,
         Action.PONG,
         b''
     )
 
-@encrypt_packet
-def make_write_ack() -> bytes:
+@make_message
+def make_write_ack(device: Device) -> bytes:
     return _make_data_packet(
         settings.IOTORO_VERSION,
         Action.WRITE_UP_ACK,
         b''
     )
 
-@encrypt_packet
-def make_read_ack() -> bytes:
+@make_message
+def make_read_ack(device: Device) -> bytes:
     return _make_data_packet(
         settings.IOTORO_VERSION,
         Action.READ_UP_ACK,
