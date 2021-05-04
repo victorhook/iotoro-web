@@ -6,8 +6,18 @@ from django.conf import settings
 
 from protocol import crypto_utils
 from protocol import api
+from protocol.models import MessageUpStream
 from device import models
 from iotoro_web import util as iotoro_utils
+
+
+class PacketDecodingException(Exception):
+    def __init__(self, msg):
+        super().__init__(msg)
+
+class IncorrectAuthException(Exception):
+    def __init__(self, msg):
+        super().__init__(msg)
 
 
 def mark_as_sent(message) -> None:
@@ -41,22 +51,21 @@ def requires_device_auth(func: callable):
             # Try to decrypt the packet
             packet = api.decode_packet(request.body, device.device_key)
 
-            # TODO: Handle these errors better.
             if packet is None:
-                print('Incorrect authorization')
-                return HttpResponse('Incorrect authorization')
+                raise PacketDecodingException()
 
             if packet.device_id == device.device_id:
                 print(f'Device id {packet.device_id} authorized')
+
+                # Turn the packet into a Message object, for the view.
+                packet = packet.to_message_upstream()
 
                 # Call the view function.
                 return func(request, device, packet)
 
             else:
-                print('Incorrect authorization')
-                return HttpResponse('Incorrect authorization')
+                raise IncorrectAuthException('Failed to authorize!')
         else:
-            print(f'No owner for device id {device_id}')
-            return HttpResponse('No such device exists.')
+            return IncorrectAuthException(f'No owner for device id {device_id}')
 
     return wrapper
