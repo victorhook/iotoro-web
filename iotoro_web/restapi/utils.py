@@ -1,4 +1,5 @@
 from django.http import HttpRequest, HttpResponse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -6,6 +7,13 @@ from django.conf import settings
 from protocol import crypto_utils
 from protocol import api
 from device import models
+from iotoro_web import util as iotoro_utils
+
+
+def mark_as_sent(message) -> None:
+    """ Marks a message as sent with a timestamp. """
+    message.sent = timezone.now()
+    message.save()
 
 
 def get_device(device_id: str) -> models.Device:
