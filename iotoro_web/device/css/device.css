@@ -15,10 +15,39 @@ label, input[type=text], select {
     font-size: 1.5em;
 }
 
+/* -- Nav tabs -- */
+
 .nav-tabs .active {
-    background-color: #385c8f !important;
+    background-color: rgb(223, 115, 43) !important;
+    color: black !important;
 }
 
+.nav-tabs > li > a {
+    color: rgb(218, 218, 218) !important;
+    font-weight: 600;
+    transition: 0.3s ease-in-out color;
+}
+
+.nav-tabs > li > a:hover {
+    color: white !important;
+}
+
+
+/* -- Data -- */
+.data-table tr:nth-child(even) {
+    background-color: #202020;
+}
+
+.clickable {
+    cursor: pointer;
+    transition: 0.3s ease-in-out background-color;
+}
+
+.clickable:hover {
+    background-color: #363636 !important;
+}
+
+/* -- */
 
 .label-help-wrapper {
     background-color: red;

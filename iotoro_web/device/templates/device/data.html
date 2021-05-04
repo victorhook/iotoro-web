@@ -6,6 +6,37 @@
 
 {% block device_content %}
 
-<h3>Data</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Sent</th>
+                <th scope="col">Action</th>
+                <th scope="col">Packet size</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for packet in packets %}
+                <tr class="clickable">
+                    <td>
+                        {{ packet.sent|date:"d-m-Y"}}
+                        {{ packet.sent|time:"H:i" }}
+                    </td>
+                    <td>
+                        {{ packet.get_action }}
+                    </td>
+                    <td>
+                        {{ packet|length }} bytes
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
+
+{% endblock %}
+
+{% block device_js %}
+    <script>
+        $('.clickable').on('click', () => console.log('ok'))
+    </script>
 {% endblock %}
