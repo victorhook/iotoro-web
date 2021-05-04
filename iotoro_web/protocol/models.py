@@ -1,10 +1,9 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.utils import timezone
 
-
 from device import models as device_models
-from . import api
 from . import params
 from iotoro_web import util
 
@@ -33,14 +32,37 @@ TYPE_CHOICES = [
 ]
 
 class Message(models.Model):
-    device = models.ForeignKey(device_models.Device, on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(default=timezone.now)
+    # Recipients.
+    msg_to = models.ForeignKey(device_models.Device, on_delete=models.CASCADE)
+    msg_from = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # Payload.
     data = models.BinaryField(max_length=settings.MAX_MESSAGE_DATA_SIZE,
-                              null=True)
-    type = models.CharField(max_length=40, choices=api.get_action_choices())
+                              blank=True, null=True)
+    
+    # Version of the packet.
+    version = models.IntegerField(default=settings.IOTORO_VERSION)
+    
+    # Type of packet.
+    action = models.CharField(max_length=40, choices=ACTIONS_CHOICES)
 
     def __str__(self):
-        return f'Device: {self.device.id} - {util.format_date(self.timestamp)}' + \
+        return f'Device: {self.msg_to.id} ' + \
                f' - {self.get_type_display()}'
 
+    def __sizeof__(self) -> int:
+        return len(self.data)
 
+    def as_bytes(self) -> bytes:
+        return self.data
+
+
+class MessageUpStream(Message):
+    sent = models.DateTimeField(default=timezone.now)
+
+
+class MessageDownStream(Message):
+    # Put in queue and actual sent can differ.
+    put_in_queue = models.DateTimeField(default=timezone.now)
+    sent = models.DateTimeField(null=True, blank=True)
+    
