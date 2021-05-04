@@ -56,7 +56,7 @@ class IotoroClient:
             logging.error('Not connected yet, cant send data!')
             return
 
-        data = api.make_data_packet(settings.IOTORO_VERSION,
+        data = api._make_data_packet(settings.IOTORO_VERSION,
                                     action,
                                     data)
 
@@ -68,8 +68,10 @@ class IotoroClient:
         # Endpoint is always BASE/md5 hash of device id.
         endpoint = f'{self._base_endpoint}/{crypto_utils.md5(self._device_id)}/'
 
-        packet = self._make_http_packet('POST', endpoint, body.as_bytes())
+        packet = self._make_http_packet('POST', endpoint, body)
 
+        print(f'Packet: {crypto_utils.ashex(body)}')
+        return
         self._sock.send(packet)
         response = self._sock.recv(1024).decode('utf-8')
         print(response)
