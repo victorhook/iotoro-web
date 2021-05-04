@@ -25,32 +25,6 @@ class Action:
     READ_DOWN_ACK = 9
 
 
-def get_action_choices() -> list:
-    return [
-        ('Pi', 'PING'),
-        ('Wu', 'WRITE_UP'),
-        ('Wd', 'WRITE_DOWN'),
-        ('Po', 'PONG'),
-        ('Ru', 'READ_UP'),
-        ('Rd', 'READ_DOWN'),
-    ]
-
-def get_type_choices() -> list:
-    return [
-        ('u8', 'unsigned int 8'),
-        ('i8', 'signed int 8'),
-        ('u16', 'unsigned int 16'),
-        ('i16', 'signed int 16'),
-        ('u32', 'unsigned int 32'),
-        ('i32', 'signed int 32'),
-        ('u64', 'unsigned int 64'),
-        ('i64', 'signed int 64'),
-        ('f', 'float'),
-        ('d', 'double'),
-        ('b', 'bool')
-    ]
-
-
 @dataclass
 class IotoroPacket:
     version: int
