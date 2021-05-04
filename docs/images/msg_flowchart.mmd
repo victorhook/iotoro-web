@@ -1,0 +1,6 @@
+stateDiagram-v2
+    [*] --> msg_in_buffer?
+    msg_in_buffer? --> yes
+    msg_in_buffer? --> no
+    yes --> msg_from_buffer
+    no --> msg_ack

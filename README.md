@@ -25,6 +25,9 @@ There are different types of messages:
 |  name | type |  value  |
 
 ## Messages
+When a device sends a message to the server, the server responds in the
+following way:
+![flowchart](docs/images/msg_flowchart.svg)
 
 ### Device -> Server
 
@@ -36,7 +39,7 @@ There are different types of messages:
 #### Write upstream
 - Version: X
 - Action: WRITE_UP
-- Content: [`{key: value}`]
+- Content: [`name, type, value`]
 
 #### Read upstream
 - Version: X
