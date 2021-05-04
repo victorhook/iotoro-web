@@ -6,54 +6,58 @@
 
 {% block device_content %}
 
-    <div class="data-table">
-        <div class="table-header row">
-            <div class="col-3">Sent</div>
-            <div class="col-3">Action</div>
-            <div class="col-3">Packet size</div>
+
+    {% if not packets %}
+        <p>No packets recieved from {{ selected_device }}</p>
+    {% else %}
+        <div class="data-table">
+            <div class="table-header row">
+                <div class="col-3">Sent</div>
+                <div class="col-3">Action</div>
+                <div class="col-3">Packet size</div>
+            </div>
+
+            <div class="table-body">
+
+                {% for packet in packets %}
+                    <details class="table-row clickable">
+                        <summary class="row">
+                            <div class="col-3">
+                                {{ packet.sent|date:"d-m-Y"}}
+                                {{ packet.sent|time:"H:i" }}
+                            </div>
+                            <div class="col-3">
+                                {{ packet.get_action }}
+                            </div>
+                            <div class="col-3">
+                                {{ packet|length }} bytes
+                            </div>
+                        </summary>
+                        <div class="table-row-content">
+                            <table>
+                                <tr>
+                                    <td>From:</td>
+                                    <td>{{ packet.user }}</td>
+                                </tr>
+                                <tr>
+                                    <td>To:</td>
+                                    <td>{{ packet.device }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Data:</td>
+                                    <td>{{ packet.data }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </details>
+
+                {% endfor %}
+
+            </div>
+
         </div>
 
-        <div class="table-body">
-
-            {% for packet in packets %}
-                <details class="table-row clickable">
-                    <summary class="row">
-                        <div class="col-3">
-                            {{ packet.sent|date:"d-m-Y"}}
-                            {{ packet.sent|time:"H:i" }}
-                        </div>
-                        <div class="col-3">
-                            {{ packet.get_action }}
-                        </div>
-                        <div class="col-3">
-                            {{ packet|length }} bytes
-                        </div>
-                    </summary>
-                    <div class="table-row-content">
-                        <table>
-                            <tr>
-                                <td>From:</td>
-                                <td>{{ packet.user }}</td>
-                            </tr>
-                            <tr>
-                                <td>To:</td>
-                                <td>{{ packet.device }}</td>
-                            </tr>
-                            <tr>
-                                <td>Data:</td>
-                                <td>{{ packet.data }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </details>
-
-            {% endfor %}
-
-        </div>
-
-    </div>
-
-
+    {% endif %}
 
 
 {% endblock %}
