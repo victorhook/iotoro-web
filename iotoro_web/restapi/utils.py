@@ -41,7 +41,6 @@ def requires_device_auth(func: callable):
             # Try to decrypt the packet
             packet = api.decode_packet(request.body, device.device_key)
 
-
             # TODO: Handle these errors better.
             if packet is None:
                 print('Incorrect authorization')

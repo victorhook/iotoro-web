@@ -33,12 +33,8 @@ TYPE_CHOICES = [
 
 class Message(models.Model):
     # Recipients.
-    msg_to = models.ForeignKey(device_models.Device, on_delete=models.CASCADE)
-    msg_from = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    # Payload.
-    data = models.BinaryField(max_length=settings.MAX_MESSAGE_DATA_SIZE,
-                              blank=True, null=True)
+    device = models.ForeignKey(device_models.Device, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     
     # Version of the packet.
     version = models.IntegerField(default=settings.IOTORO_VERSION)
@@ -46,9 +42,12 @@ class Message(models.Model):
     # Type of packet.
     action = models.CharField(max_length=40, choices=ACTIONS_CHOICES)
 
+    # Payload.
+    data = models.BinaryField(max_length=settings.MAX_MESSAGE_DATA_SIZE,
+                              blank=True, null=True)
+
     def __str__(self):
-        return f'Device: {self.msg_to.id} ' + \
-               f' - {self.get_type_display()}'
+        return f'Device: {self.device.id} ' 
 
     def __sizeof__(self) -> int:
         return len(self.data)
