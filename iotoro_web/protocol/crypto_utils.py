@@ -74,7 +74,7 @@ def decrypt_packet(data: bytes, device_key: bytes) -> bytes:
     return decrypted
 
 
-def encrypt_packet(device_key: bytes, device_id: bytes, data: bytes) -> bytes:
+def encrypt_packet(device_key: str, device_id: str, data: bytes) -> bytes:
     """ Encrypts the given data with the device key and returns a packet. """
     device_key = binascii.unhexlify(device_key)
     device_id = binascii.unhexlify(device_id)
