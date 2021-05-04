@@ -17,6 +17,19 @@ ACTIONS_CHOICES = [
     ('Rd', 'READ_DOWN'),
 ]
 
+ACTION_TABLE = [
+    'PING',
+    'WRITE_UP',
+    'WRITE_UP_ACK',
+    'WRITE_DOWN',
+    'WRITE_DOWN_ACK',
+    'PONG',
+    'READ_UP',
+    'READ_UP_ACK',
+    'READ_DOWN',
+    'READ_DOWN_ACK',
+]
+
 TYPE_CHOICES = [
     ('u8', 'unsigned int 8'),
     ('i8', 'signed int 8'),
@@ -49,8 +62,11 @@ class Message(models.Model):
     def __str__(self):
         return f'Device: {self.device.id} ' 
 
-    def __sizeof__(self) -> int:
-        return len(self.data)
+    def __len__(self) -> int:
+        return settings.IOTORO_HEADER_SIZE + len(self.data)
+
+    def get_action(self) -> str:
+        return ACTION_TABLE[int(self.action)]
 
     def as_bytes(self) -> bytes:
         return self.data
